@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["common"]
+
+[project]
+name = "auth-mocks"
+version = "0.1.0"
+description = "4 个独立的集成认证 mock 示例: LDAP / OIDC / HTTP Callback / Proxy Header(支持 dbx 多用户联调)"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+    "python-multipart>=0.0.9",
+    "httpx>=0.27",
+    "pyjwt[crypto]>=2.9",
+    "cryptography>=42.0",
+    "ldap3>=0.9.9",
+    "ldaptor>=21.2.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["ldap", "oidc", "http_callback", "proxy_header"]
+filterwarnings = [
+    # 以下告警均来自第三方依赖内部调用的弃用 API, 与本仓库代码无关, 按来源模块屏蔽:
+    # - ldap3 → pyasn1 的 tagMap/typeMap DeprecationWarning
+    # - ldaptor → pyparsing 的 setName/setParseAction/leaveWhitespace 等 PyparsingDeprecationWarning
+    # 相关库均无修复版本可用(ldap3 2.9.9 / ldaptor 21.2.0 已是最新), 锁旧依赖不可取。
+    "ignore:::ldap3.*",
+    "ignore:::ldaptor.*",
+]
